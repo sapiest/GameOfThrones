@@ -18,6 +18,12 @@
     <style name="SplashTheme" parent="Theme.GameOfThrones">
         <item name="android:windowFullscreen">true</item>
         <item name="android:statusBarColor">@color/black</item>
-        <item name="android:windowBackground">@drawable/</item>
+        <item name="android:windowBackground">@drawable/splash_bg</item>
     </style>
+
+    <style name="Theme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar"/>
+
+    <style name="Theme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light"/>
+
+
 </resources>

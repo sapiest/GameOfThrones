@@ -6,6 +6,11 @@ plugins {
 android {
     compileSdkVersion 30
 
+    buildFeatures {
+        //noinspection DataBindingWithoutKapt
+        dataBinding true
+    }
+
     defaultConfig {
         applicationId "ru.skillbranch.gameofthrones"
         minSdkVersion 23
