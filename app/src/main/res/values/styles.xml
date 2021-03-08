@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="CollapsingTitleAppearance" parent="TextAppearance.Design.CollapsingToolbar.Expanded">
+        <item name="android:textSize">45sp</item>
+    </style>
+</resources>
