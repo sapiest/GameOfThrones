@@ -8,13 +8,11 @@ import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import ru.skillbranch.gameofthrones.Constants.DATABASE_NAME
-import ru.skillbranch.gameofthrones.DatabaseManager.db
+import ru.skillbranch.gameofthrones.additional.Constants.DATABASE_NAME
 import ru.skillbranch.gameofthrones.NetworkService.api
 import ru.skillbranch.gameofthrones.data.remote.services.GOTService
 import ru.skillbranch.gameofthrones.data.room.GOTRoomDatabase
 import ru.skillbranch.gameofthrones.repositories.HouseRepository
-import kotlin.math.log
 
 class GOTApplication : Application() {
 

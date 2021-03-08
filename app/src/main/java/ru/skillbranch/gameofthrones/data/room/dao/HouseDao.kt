@@ -13,6 +13,9 @@ interface HouseDao {
     @Query("SELECT * FROM houses_table")
     fun getHouses(): Flow<List<HouseRoomEntity>>
 
+    @Query("SELECT * FROM houses_table WHERE house_name = :name")
+    fun getHousesByName(name: String): Flow<List<HouseRoomEntity>>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(house: HouseRoomEntity)
 

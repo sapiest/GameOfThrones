@@ -1,4 +1,4 @@
-package ru.skillbranch.gameofthrones.data.local.entities
+package ru.skillbranch.gameofthrones.data.room.entities
 
 data class Character(
     val id: String,

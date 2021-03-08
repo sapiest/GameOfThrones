@@ -12,8 +12,8 @@ interface GOTService {
     suspend fun getHouse(@Query("page") page: Int): List<HouseRes>
 
     @GET("characters/{id}")
-    suspend fun getCharacterById(@Path("id") id: String): Deferred<CharacterRes>
+    suspend fun getCharacterById(@Path("id") id: String): CharacterRes
 
     @GET("houses")
-    suspend fun getHouseByName(@Query("name") name: String): Deferred<List<HouseRes>>
+    suspend fun getHouseByName(@Query("name") name: String): List<HouseRes>
 }

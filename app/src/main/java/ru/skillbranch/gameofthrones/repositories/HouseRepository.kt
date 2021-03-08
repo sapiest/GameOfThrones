@@ -4,10 +4,9 @@ import android.util.Log
 import androidx.annotation.WorkerThread
 import androidx.lifecycle.asLiveData
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.toList
-import ru.skillbranch.gameofthrones.AppConfig
-import ru.skillbranch.gameofthrones.data.local.entities.House
+import ru.skillbranch.gameofthrones.additional.toShortHouseName
 import ru.skillbranch.gameofthrones.data.remote.res.HouseRes
 import ru.skillbranch.gameofthrones.data.remote.services.GOTService
 import ru.skillbranch.gameofthrones.data.room.dao.HouseDao
@@ -23,25 +22,45 @@ class HouseRepository(private val houseDao: HouseDao, private val gotService: GO
         houseDao.insert(house)
     }
 
+    private suspend fun getHouseFromServerByName(name: String): List<HouseRes> {
+        val result = gotService.getHouseByName(name)
+        result.forEach{
+            insert(it.toDatabaseModel())
+        }
+        return result
+    }
+
     private suspend fun getAllHousesFromServer(): List<HouseRes> {
         val allHouses = mutableListOf<HouseRes>()
-            var page = 1
+        var page = 1
 
-            do {
-                val result = gotService.getHouse(page++)
-                result.forEach { house ->
-                    insert(house.toDatabaseModel())
-                    allHouses.add(house)
-                    Log.e("size", house.url)
-                }
-            }while (result.isNotEmpty())
+        do {
+            val result = gotService.getHouse(page++)
+            result.forEach { house ->
+                insert(house.toDatabaseModel())
+                allHouses.add(house)
+                Log.e("size", house.url)
+            }
+        } while (result.isNotEmpty())
         return allHouses
     }
 
     suspend fun getAllHouses(): Flow<List<HouseRes>> {
-       return houseDao.getHouses().map {
+        return houseDao.getHouses().map {
             return@map if (it.isEmpty()) {
                 getAllHousesFromServer()
+            } else {
+                it.map {
+                    it.toBaseModel()
+                }
+            }
+        }
+    }
+
+    suspend fun getHousesByName(name: String): Flow<List<HouseRes>> {
+        return houseDao.getHousesByName(name.toShortHouseName()).map {
+            return@map if (it.isEmpty()) {
+                getHouseFromServerByName(name)
             } else {
                 it.map {
                     it.toBaseModel()

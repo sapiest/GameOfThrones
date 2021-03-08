@@ -1,5 +1,6 @@
 package ru.skillbranch.gameofthrones.data.remote.res
 
+import ru.skillbranch.gameofthrones.additional.toShortHouseName
 import ru.skillbranch.gameofthrones.data.room.entities.HouseRoomEntity
 
 data class HouseRes(
@@ -20,11 +21,8 @@ data class HouseRes(
     val cadetBranches: List<String> = listOf(),
     val swornMembers: List<String> = listOf()
 ) {
-    private fun toShortName() = name.split(" ")[1]
-
-
     fun toDatabaseModel() = HouseRoomEntity(
-        name = toShortName(),
+        name = name.toShortHouseName(),
         url = url,
         coatOfArms = coatOfArms,
         founder = founder,

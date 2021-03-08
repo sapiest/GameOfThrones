@@ -2,19 +2,14 @@ package ru.skillbranch.gameofthrones.repositories
 
 import android.util.Log
 import androidx.annotation.VisibleForTesting
-import androidx.lifecycle.asLiveData
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.*
 import ru.skillbranch.gameofthrones.GOTApplication
-import ru.skillbranch.gameofthrones.data.local.entities.CharacterFull
-import ru.skillbranch.gameofthrones.data.local.entities.CharacterItem
+import ru.skillbranch.gameofthrones.additional.toShortHouseName
+import ru.skillbranch.gameofthrones.data.room.entities.CharacterFull
+import ru.skillbranch.gameofthrones.data.room.entities.CharacterItem
 import ru.skillbranch.gameofthrones.data.remote.res.CharacterRes
 import ru.skillbranch.gameofthrones.data.remote.res.HouseRes
-import ru.skillbranch.gameofthrones.data.room.dao.HouseDao
-import ru.skillbranch.gameofthrones.viewmodels.HouseViewModel
 
 object RootRepository {
 
@@ -43,9 +38,24 @@ object RootRepository {
      * @param houseNames - массив полных названий домов (смотри AppConfig)
      * @param result - колбек содержащий в себе список данных о домах
      */
+    @FlowPreview
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     fun getNeedHouses(vararg houseNames: String, result: (houses: List<HouseRes>) -> Unit) {
-        //TODO implement me
+        CoroutineScope(Dispatchers.IO).launch {
+            val flows = mutableListOf<Flow<List<HouseRes>>>()
+            houseNames.forEach {
+                for (name in houseNames) {
+                    val data = houseRepository.getHousesByName(name)
+                    flows.add(data)
+                }
+
+                combine(*(flows.toTypedArray())) { elements ->
+                    elements.flatMap { it }
+                }.collect {
+                    result(it)
+                }
+            }
+        }
     }
 
     /**
@@ -69,6 +79,14 @@ object RootRepository {
      */
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     fun insertHouses(houses: List<HouseRes>, complete: () -> Unit) {
+        CoroutineScope(Dispatchers.IO).launch {
+            houses.forEach {
+                houseRepository.insert(it.toDatabaseModel())
+            }
+            withContext(Dispatchers.Main) {
+                complete.invoke()
+            }
+        }
         //TODO implement me
     }
 
@@ -89,7 +107,11 @@ object RootRepository {
      */
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     fun dropDb(complete: () -> Unit) {
-        //TODO implement me
+        // GOTApplication.database.clearAllTables()
+        CoroutineScope(Dispatchers.Main).launch {
+            GOTApplication.database.housesDao().deleteAll()
+        }
+        complete.invoke()
     }
 
     /**
@@ -111,7 +133,7 @@ object RootRepository {
      */
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     fun findCharacterFullById(id: String, result: (character: CharacterFull) -> Unit) {
-        //TODO implement me
+
     }
 
     /**
@@ -119,7 +141,13 @@ object RootRepository {
      * @param result - колбек о завершении очистки db
      */
     fun isNeedUpdate(result: (isNeed: Boolean) -> Unit) {
-        //TODO implement me
+        CoroutineScope(Dispatchers.IO).launch {
+            val data = GOTApplication.database.housesDao().getHouses()
+            withContext(Dispatchers.Main) {
+                data.collect {
+                    result(it.isEmpty())
+                }
+            }
+        }
     }
-
 }
