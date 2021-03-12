@@ -12,6 +12,7 @@ import ru.skillbranch.gameofthrones.additional.Constants.DATABASE_NAME
 import ru.skillbranch.gameofthrones.NetworkService.api
 import ru.skillbranch.gameofthrones.data.remote.services.GOTService
 import ru.skillbranch.gameofthrones.data.room.GOTRoomDatabase
+import ru.skillbranch.gameofthrones.repositories.CharacterRepository
 import ru.skillbranch.gameofthrones.repositories.HouseRepository
 
 class GOTApplication : Application() {
@@ -31,7 +32,9 @@ class GOTApplication : Application() {
 
         val database by lazy { GOTRoomDatabase.getDatabase(applicationContext(), applicationScope) }
 
-        val repository by lazy { HouseRepository(database.housesDao(), api) }
+        val houseRepository by lazy { HouseRepository(database.housesDao(), api) }
+
+        val characterRepository by lazy { CharacterRepository(database.characterDao(), api) }
     }
 }
 

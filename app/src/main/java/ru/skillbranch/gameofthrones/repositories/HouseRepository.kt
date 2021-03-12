@@ -13,19 +13,19 @@ import ru.skillbranch.gameofthrones.data.room.dao.HouseDao
 import ru.skillbranch.gameofthrones.data.room.entities.HouseRoomEntity
 
 class HouseRepository(private val houseDao: HouseDao, private val gotService: GOTService) {
-    private val allHouses: Flow<List<HouseRoomEntity>> = houseDao.getHouses()
+    //private val allHouses: Flow<List<HouseRoomEntity>> = houseDao.getHouses()
     //private val allHousesFromServer = MediatorLiveData<>
 
     @Suppress("RedundantSuspendModifier")
     @WorkerThread
-    suspend fun insert(house: HouseRoomEntity) {
-        houseDao.insert(house)
+    suspend fun insert(house: HouseRes) {
+        houseDao.insert(house.toDatabaseModel())
     }
 
     private suspend fun getHouseFromServerByName(name: String): List<HouseRes> {
         val result = gotService.getHouseByName(name)
         result.forEach{
-            insert(it.toDatabaseModel())
+            insert(it)
         }
         return result
     }
@@ -37,9 +37,8 @@ class HouseRepository(private val houseDao: HouseDao, private val gotService: GO
         do {
             val result = gotService.getHouse(page++)
             result.forEach { house ->
-                insert(house.toDatabaseModel())
+                insert(house)
                 allHouses.add(house)
-                Log.e("size", house.url)
             }
         } while (result.isNotEmpty())
         return allHouses

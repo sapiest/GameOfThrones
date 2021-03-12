@@ -14,10 +14,9 @@ import ru.skillbranch.gameofthrones.repositories.HouseRepository
 class HouseViewModel(private val repository: HouseRepository) : ViewModel() {
     //val allHouses: LiveData<List<HouseRes>> = repository.getAllHouses().asLiveData()
 
-    fun insert(house: HouseRoomEntity) = viewModelScope.launch {
+    fun insert(house: HouseRes) = viewModelScope.launch {
         repository.insert(house)
     }
-
 
     fun getAllHouses(result: (houses: List<HouseRes>) -> Unit): Job = viewModelScope.launch {
         val data = repository.getAllHouses()

@@ -5,7 +5,6 @@ import androidx.annotation.VisibleForTesting
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import ru.skillbranch.gameofthrones.GOTApplication
-import ru.skillbranch.gameofthrones.additional.toShortHouseName
 import ru.skillbranch.gameofthrones.data.room.entities.CharacterFull
 import ru.skillbranch.gameofthrones.data.room.entities.CharacterItem
 import ru.skillbranch.gameofthrones.data.remote.res.CharacterRes
@@ -18,7 +17,7 @@ object RootRepository {
      * @param result - колбек содержащий в себе список данных о домах
      */
 
-    private val houseRepository = GOTApplication.repository
+    private val houseRepository = GOTApplication.houseRepository
 
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     fun getAllHouses(result: (houses: List<HouseRes>) -> Unit) {
@@ -79,15 +78,12 @@ object RootRepository {
      */
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     fun insertHouses(houses: List<HouseRes>, complete: () -> Unit) {
-        CoroutineScope(Dispatchers.IO).launch {
+        CoroutineScope(Dispatchers.Main).launch {
             houses.forEach {
-                houseRepository.insert(it.toDatabaseModel())
+                houseRepository.insert(it)
             }
-            withContext(Dispatchers.Main) {
-                complete.invoke()
-            }
+            complete.invoke()
         }
-        //TODO implement me
     }
 
     /**
